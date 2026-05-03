@@ -7,6 +7,7 @@ A hosted [MCP](https://modelcontextprotocol.io) server that gives Claude, ChatGP
 [![Status](https://img.shields.io/badge/status-public%20beta-blue)](https://superpowers.social)
 [![Free](https://img.shields.io/badge/pricing-free%20during%20beta-green)](https://superpowers.social)
 [![MCP](https://img.shields.io/badge/protocol-MCP-purple)](https://modelcontextprotocol.io)
+[![smithery badge](https://smithery.ai/badge/pkobielak/social-superpowers)](https://smithery.ai/servers/pkobielak/social-superpowers)
 
 ---
 
