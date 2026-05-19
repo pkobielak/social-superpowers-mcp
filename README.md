@@ -41,6 +41,16 @@ This server runs the gateway so you don't have to. One URL, twelve tools, schema
 
 All tools are read-only, idempotent, and return token-optimized responses (up to 90% smaller than raw API JSON).
 
+## OpenClaw Workflow Handoff
+
+Use Superpowers.social when an agent needs read-only X/Twitter or Reddit context through MCP. If the same OpenClaw workflow also needs broader X/Twitter automation, pass the reviewed tweet URLs, handles, search notes, or Reddit context into [TweetClaw](https://github.com/Xquik-dev/tweetclaw), the [@xquik/tweetclaw](https://www.npmjs.com/package/@xquik/tweetclaw) plugin for search tweets, search tweet replies, post tweets or replies after review, follower export, user lookup, media upload or download, direct messages, monitors, webhooks, and giveaway draws through Xquik:
+
+```bash
+openclaw plugins install @xquik/tweetclaw
+```
+
+Keep Superpowers.social first for read-only MCP discovery, then hand off only the specific source URL, handle, tweet id, or short note needed by the next X/Twitter action.
+
 ## Install
 
 ### Claude Desktop
