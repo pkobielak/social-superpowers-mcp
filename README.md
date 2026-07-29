@@ -15,7 +15,7 @@ A hosted [MCP](https://modelcontextprotocol.io) server that gives Claude, ChatGP
 
 The official APIs are paywalled into oblivion (X starts at $100/mo, Reddit is heavily rate limiting). Direct scraping flags accounts in days. Most agents end up stuck on stale article snippets while the actual conversation happens on X and Reddit.
 
-This server runs the gateway so you don't have to. One URL, twelve tools, schema-validated responses, token-optimized payloads.
+This server runs the gateway so you don't have to. One URL, ten tools, schema-validated responses, token-optimized payloads.
 
 ## Tools
 
@@ -28,14 +28,12 @@ This server runs the gateway so you don't have to. One URL, twelve tools, schema
 | `twitter-user-tweets` | Recent tweets from a user |
 | `twitter-news` | Trending news on X |
 
-### Reddit (7)
+### Reddit (5)
 | Tool | What it does |
 |---|---|
-| `reddit-search` | Search posts across Reddit |
+| `reddit-search` | Search posts across Reddit or one subreddit |
 | `reddit-get-post` | Get a post + comments |
-| `reddit-get-posts` | Get posts from a subreddit |
-| `reddit-get-subreddit-info` | Subreddit metadata |
-| `reddit-get-user-info` | Reddit user profile |
+| `reddit-get-posts` | Get hot/new/top posts from a subreddit |
 | `reddit-get-user-posts` | Posts submitted by a user |
 | `reddit-get-user-comments` | Comments by a user |
 
@@ -47,6 +45,13 @@ All tools are read-only, idempotent, and return token-optimized responses (up to
 Settings → Connectors → **Add custom connector**:
 - **Name:** `social-superpowers`
 - **URL:** `https://superpowers.social/mcp`
+
+### ChatGPT (desktop or web)
+Settings → Apps & Connectors → enable **Developer mode** (one-time) → **Create**:
+- **Name:** `social-superpowers`
+- **URL:** `https://superpowers.social/mcp`
+
+All tools are read-only, so the connector works on Plus/Pro developer mode.
 
 ### Claude Code
 ```bash
@@ -84,7 +89,7 @@ Agent: [calls twitter-search with q="$INTC", time_range="7d"]
        → returns 25 tweets with sentiment, engagement, top replies
 
 You: which subreddits discuss the Tirzepatide side-effects?
-Agent: [calls reddit-search → reddit-get-subreddit-info → reddit-get-posts]
+Agent: [calls reddit-search → reddit-get-posts → reddit-get-post]
        → grounded answer with permalinks
 ```
 
@@ -95,7 +100,7 @@ Agent: [calls reddit-search → reddit-get-subreddit-info → reddit-get-posts]
 ## Status & Limits
 
 - Uptime / status: [superpowers.social](https://superpowers.social)
-- Soft per-IP rate limits during beta to keep the service open. Contact for higher limits.
+- Fair-use limits may apply during beta to keep the service open for everyone.
 
 ## Specs
 
@@ -113,4 +118,5 @@ MIT — this repository contains the public manifest, examples, and docs. The ho
 - Site: <https://superpowers.social>
 - MCP endpoint: <https://superpowers.social/mcp>
 - Issues / feature requests: open an issue on this repo
+- Agent-readable reference: <https://superpowers.social/llms.txt>
 - MCP spec: <https://modelcontextprotocol.io>
