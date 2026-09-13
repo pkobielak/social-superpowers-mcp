@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-13
+
+- Anonymous access paused after abuse of the free anonymous tier. Access now requires a free API key, issued by email (hello@superpowers.social).
+
 ## 0.1.0 — 2026-04-29
 
 Initial public beta.

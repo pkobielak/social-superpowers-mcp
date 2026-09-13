@@ -1,11 +1,16 @@
 # Superpowers.social — MCP server for X/Twitter & Reddit
 
-A hosted [MCP](https://modelcontextprotocol.io) server that gives Claude, ChatGPT, Cursor, and any agent runtime live tool-use access to **X/Twitter** and **Reddit**. No API keys. No scraping setup. No banned accounts.
+> **Status (2026-09-13): anonymous access is paused** after abuse of the free anonymous tier.
+> Access now requires a free API key. **New users: email
+> [hello@superpowers.social](mailto:hello@superpowers.social?subject=Free%20API%20key) and you
+> get one, free.** Send it as `Authorization: Bearer <key>` (or `x-api-key`) with the URL below.
+
+A hosted [MCP](https://modelcontextprotocol.io) server that gives Claude, ChatGPT, Cursor, and any agent runtime live tool-use access to **X/Twitter** and **Reddit**. No X/Reddit API keys. No scraping setup. No banned accounts.
 
 **Endpoint:** `https://superpowers.social/mcp` (Streamable HTTP)
 
-[![Status](https://img.shields.io/badge/status-public%20beta-blue)](https://superpowers.social)
-[![Free](https://img.shields.io/badge/pricing-free%20during%20beta-green)](https://superpowers.social)
+[![Status](https://img.shields.io/badge/status-anonymous%20access%20paused-orange)](https://superpowers.social)
+[![Free](https://img.shields.io/badge/pricing-free%20API%20key%20by%20email-green)](mailto:hello@superpowers.social?subject=Free%20API%20key)
 [![MCP](https://img.shields.io/badge/protocol-MCP-purple)](https://modelcontextprotocol.io)
 [![smithery badge](https://smithery.ai/badge/pkobielak/social-superpowers)](https://smithery.ai/servers/pkobielak/social-superpowers)
 
@@ -95,17 +100,21 @@ Agent: [calls reddit-search → reddit-get-posts → reddit-get-post]
 
 ## Pricing
 
-**Free during public beta.** No OAuth. No login. No credit card required.
+**Free, with an API key.** No OAuth. No credit card. Email
+[hello@superpowers.social](mailto:hello@superpowers.social?subject=Free%20API%20key) with one line
+about what you are building and you get a key with a daily call allowance. Higher allowances on request.
 
 ## Status & Limits
 
+- **Anonymous access is paused** since 2026-09-13 after abuse of the free anonymous tier.
+  Calls without a key are rejected.
 - Uptime / status: [superpowers.social](https://superpowers.social)
-- Fair-use limits may apply during beta to keep the service open for everyone.
+- Keyed access has a per-key daily call limit. Contact the address above for more.
 
 ## Specs
 
 - **Transport:** Streamable HTTP (`https://superpowers.social/mcp`)
-- **Auth:** none required during beta
+- **Auth:** API key, `Authorization: Bearer <key>` or `x-api-key: <key>` header (free by email, see Pricing)
 - **Spec version:** MCP 2025-12-11
 - **Source platforms:** X/Twitter, Reddit
 
