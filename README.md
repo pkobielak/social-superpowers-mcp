@@ -1,86 +1,102 @@
 # Superpowers.social — MCP server for X/Twitter & Reddit
 
-> **Status (2026-09-13): anonymous access is paused** after abuse of the free anonymous tier.
-> Access now requires a free API key. **New users: email
-> [hello@superpowers.social](mailto:hello@superpowers.social?subject=Free%20API%20key) and you
-> get one, free.** Send it as `Authorization: Bearer <key>` (or `x-api-key`) with the URL below.
+Hosted [MCP](https://modelcontextprotocol.io) server for live X/Twitter and Reddit
+research. 10 read-only tools for search, threads, timelines, posts and comments.
+Streamable HTTP: add the URL and sign in with Google or GitHub when prompted.
+Free tier available.
 
-A hosted [MCP](https://modelcontextprotocol.io) server that gives Claude, ChatGPT, Cursor, and any agent runtime live tool-use access to **X/Twitter** and **Reddit**. No X/Reddit API keys. No scraping setup. No banned accounts.
+- **Website:** <https://superpowers.social>
+- **Endpoint:** `https://superpowers.social/mcp` (Streamable HTTP)
 
-**Endpoint:** `https://superpowers.social/mcp` (Streamable HTTP)
-
-[![Status](https://img.shields.io/badge/status-anonymous%20access%20paused-orange)](https://superpowers.social)
-[![Free](https://img.shields.io/badge/pricing-free%20API%20key%20by%20email-green)](mailto:hello@superpowers.social?subject=Free%20API%20key)
+[![Status](https://img.shields.io/badge/status-live-brightgreen)](https://superpowers.social)
+[![Pricing](https://img.shields.io/badge/pricing-free%20tier-green)](https://superpowers.social)
 [![MCP](https://img.shields.io/badge/protocol-MCP-purple)](https://modelcontextprotocol.io)
-[![smithery badge](https://smithery.ai/badge/pkobielak/social-superpowers)](https://smithery.ai/servers/pkobielak/social-superpowers)
 
 ---
 
-## Why
-
-The official APIs are paywalled into oblivion (X starts at $100/mo, Reddit is heavily rate limiting). Direct scraping flags accounts in days. Most agents end up stuck on stale article snippets while the actual conversation happens on X and Reddit.
-
-This server runs the gateway so you don't have to. One URL, ten tools, schema-validated responses, token-optimized payloads.
-
 ## Tools
 
+All ten tools are read-only and idempotent. Eight of them trim the upstream
+response to the fields listed below and, when the trim saves enough to be worth
+reporting, append a stats line saying how much was stripped. `twitter-news` and
+`reddit-get-user-comments` are the exceptions: they return the upstream objects
+as they arrive, so the field lists below do not describe them and no stats line
+is emitted.
+
 ### X/Twitter (5)
-| Tool | What it does |
-|---|---|
-| `twitter-search` | Search tweets by query with engagement metrics |
-| `twitter-read` | Read a single tweet by URL or ID |
-| `twitter-thread` | Read a full conversation thread |
-| `twitter-user-tweets` | Recent tweets from a user |
-| `twitter-news` | Trending news on X |
+
+| Tool | What it does | Arguments |
+|---|---|---|
+| `twitter-search` | Search tweets matching a query | `query` (required), `count` (default 10), `cursor`, `text_only` |
+| `twitter-read` | Read a single tweet | `tweet` (URL or ID, required), `text_only` |
+| `twitter-thread` | Read a full conversation thread | `tweet` (URL or ID, required), `cursor`, `text_only` |
+| `twitter-user-tweets` | Recent tweets from one account | `handle` (required, no `@`), `count` (default 20), `cursor`, `text_only` |
+| `twitter-news` | Trending news on X | `count` (default 10), `category` (`for-you`, `news`, `sports`, `entertainment`, `trending`) |
+
+Tweet fields, for `twitter-search`, `twitter-read`, `twitter-thread` and
+`twitter-user-tweets`: `id`, `text`, `createdAt`, `author`, `authorName`, `url`,
+and `replyCount` / `retweetCount` / `likeCount` when X returns them. Quoted
+tweets are nested under `quotedTweet`. `text_only` reduces each tweet to
+`{id, text}`. `twitter-news` returns news items, not tweets, and passes their
+fields through unchanged apart from a curation prefix stripped off `category`.
 
 ### Reddit (5)
-| Tool | What it does |
-|---|---|
-| `reddit-search` | Search posts across Reddit or one subreddit |
-| `reddit-get-post` | Get a post + comments |
-| `reddit-get-posts` | Get hot/new/top posts from a subreddit |
-| `reddit-get-user-posts` | Posts submitted by a user |
-| `reddit-get-user-comments` | Comments by a user |
 
-All tools are read-only, idempotent, and return token-optimized responses (up to 90% smaller than raw API JSON).
+| Tool | What it does | Arguments |
+|---|---|---|
+| `reddit-search` | Search posts across Reddit or one subreddit | `query` (required), `subreddit`, `count` (default 10), `sort`, `time_filter`, `text_only` |
+| `reddit-get-post` | A post plus its comments | `post_id` (required), `subreddit`, `comment_limit` (default 10) |
+| `reddit-get-posts` | Top posts from a subreddit for a time window | `subreddit` (required), `count` (default 10), `time_filter` (default `week`), `text_only` |
+| `reddit-get-user-posts` | Posts submitted by a user | `username` (required), `count` (default 10), `sort` (default `new`), `time_filter` (default `all`), `text_only` |
+| `reddit-get-user-comments` | Comments by a user | `username` (required), `count` (default 10), `sort` (default `new`), `time_filter` (default `all`) |
 
-## Install
+Post fields: `id`, `title`, `author`, `subreddit`, `createdUtc`, `url`, and the
+post body when there is one. The list tools — `reddit-search`,
+`reddit-get-posts`, `reddit-get-user-posts` — truncate that body to a
+500-character `selftext_preview`; `reddit-get-post` returns the full `selftext`
+and its comments as `id`, `author`, `body`, plus `depth` where the source gives
+one. `text_only` reduces each post to `{id, title}`. None of these carry a
+Reddit score or comment count — the source does not provide them.
+`reddit-get-user-comments` applies no field filtering — its comment objects come
+through as the source returns them.
 
-### Claude Desktop
-Settings → Connectors → **Add custom connector**:
-- **Name:** `social-superpowers`
-- **URL:** `https://superpowers.social/mcp`
+## Setup
 
-### ChatGPT (desktop or web)
-Settings → Apps & Connectors → enable **Developer mode** (one-time) → **Create**:
-- **Name:** `social-superpowers`
-- **URL:** `https://superpowers.social/mcp`
+Authentication is required for every call — an unauthenticated `initialize`
+returns 401.
 
-All tools are read-only, so the connector works on Plus/Pro developer mode.
+### Claude Code (verified 2026-09-16)
 
-### Claude Code
 ```bash
 claude mcp add --transport http social-superpowers https://superpowers.social/mcp
 ```
 
-### Cursor
-Settings → MCP → Add new MCP Server:
-```json
-{
-  "social-superpowers": {
-    "type": "http",
-    "url": "https://superpowers.social/mcp"
-  }
-}
-```
+Sign in with Google or GitHub when Claude Code opens the browser prompt. That is
+the whole setup — the ten tools are then available in the session.
 
-### Any MCP client (`mcp.json`)
+### Any other MCP client
+
+Any client that speaks Streamable HTTP can connect to
+`https://superpowers.social/mcp` with either:
+
+- **its own MCP OAuth sign-in flow**, if it supports one — the same Google or
+  GitHub prompt, nothing to set up in advance; or
+- **an API key**, for clients without MCP OAuth: mint a key at
+  <https://superpowers.social/account> and send it as
+  `Authorization: Bearer sk_live_…` or `x-api-key`.
+
+Generic Streamable-HTTP-with-API-key configuration shape (adjust to your
+client's own config format):
+
 ```json
 {
   "mcpServers": {
     "social-superpowers": {
       "type": "http",
-      "url": "https://superpowers.social/mcp"
+      "url": "https://superpowers.social/mcp",
+      "headers": {
+        "Authorization": "Bearer sk_live_…"
+      }
     }
   }
 }
@@ -89,43 +105,25 @@ Settings → MCP → Add new MCP Server:
 ## Examples
 
 ```
-You: search X for what people are saying about $INTC catalysts this week
-Agent: [calls twitter-search with q="$INTC", time_range="7d"]
-       → returns 25 tweets with sentiment, engagement, top replies
+You: what are people on X saying about $INTC?
+Agent: twitter-search { "query": "$INTC", "count": 25 }
+       → up to 25 tweets with author, timestamp, link and reply/retweet/like counts
 
-You: which subreddits discuss the Tirzepatide side-effects?
-Agent: [calls reddit-search → reddit-get-posts → reddit-get-post]
-       → grounded answer with permalinks
+You: which subreddits discuss Tirzepatide side effects?
+Agent: reddit-search { "query": "tirzepatide side effects", "count": 10 }
+       → posts with author, subreddit, permalink and a body preview
+       reddit-get-post { "post_id": "1abc234" }
+       → the full post with its comments
 ```
-
-## Pricing
-
-**Free, with an API key.** No OAuth. No credit card. Email
-[hello@superpowers.social](mailto:hello@superpowers.social?subject=Free%20API%20key) with one line
-about what you are building and you get a key with a daily call allowance. Higher allowances on request.
-
-## Status & Limits
-
-- **Anonymous access is paused** since 2026-09-13 after abuse of the free anonymous tier.
-  Calls without a key are rejected.
-- Uptime / status: [superpowers.social](https://superpowers.social)
-- Keyed access has a per-key daily call limit. Contact the address above for more.
-
-## Specs
-
-- **Transport:** Streamable HTTP (`https://superpowers.social/mcp`)
-- **Auth:** API key, `Authorization: Bearer <key>` or `x-api-key: <key>` header (free by email, see Pricing)
-- **Spec version:** MCP 2025-12-11
-- **Source platforms:** X/Twitter, Reddit
 
 ## License
 
-MIT — this repository contains the public manifest, examples, and docs. The hosted gateway implementation is closed-source; the MCP contract is the integration surface.
+MIT — this repository contains the public manifest, examples, and docs. The
+hosted gateway implementation is closed-source; the MCP contract is the
+integration surface.
 
 ## Links
 
 - Site: <https://superpowers.social>
 - MCP endpoint: <https://superpowers.social/mcp>
-- Issues / feature requests: open an issue on this repo
-- Agent-readable reference: <https://superpowers.social/llms.txt>
 - MCP spec: <https://modelcontextprotocol.io>
